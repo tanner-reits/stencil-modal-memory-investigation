@@ -9,7 +9,7 @@ export class AppRoot {
 
   @State() state: any = {};
 
-  async openModal(withList: boolean = false) {
+  async openModal(withList: boolean, manual: boolean = false) {
     let modal = await modalController.create({
       component: 'app-home',
       handle: false,
@@ -21,11 +21,18 @@ export class AppRoot {
         withList
       }
     });
-    modal.onDidDismiss().then(() => {
-      this.openModal(withList);
-    });
+
+    if (!manual) {
+      modal.onDidDismiss().then(() => {
+        this.openModal(withList);
+      });
+    }
 
     await modal.present();
+    if (manual) {
+      return;
+    }
+
     setTimeout(() => modal.dismiss(), 300);
   }
 
@@ -39,8 +46,9 @@ export class AppRoot {
         <main class="ion-padding">
           {/* This empty list is required to make the leak */}
           <ion-list></ion-list>
-          <ion-button expand="block" onClick={() => this.openModal()}>Run Working</ion-button>
+          <ion-button expand="block" onClick={() => this.openModal(false)}>Run Working</ion-button>
           <ion-button expand="block" onClick={() => this.openModal(true)}>Run Broken</ion-button>
+          <ion-button expand="block" onClick={() => this.openModal(true, true)}>Run Broken Manual</ion-button>
         </main>
       </div>
     );
