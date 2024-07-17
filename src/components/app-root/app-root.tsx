@@ -3,10 +3,10 @@ import { Component, h, State } from '@stencil/core';
 
 @Component({
   tag: 'app-root',
-  styleUrl: 'app-root.css'
+  styleUrl: 'app-root.css',
+  shadow: true,
 })
 export class AppRoot {
-
   @State() state: any = {};
 
   @State() totalHeapSize: number = 0;
@@ -14,6 +14,17 @@ export class AppRoot {
 
   @State() startingTotal: number = 0;
   @State() startingUsed: number = 0;
+
+  async createNodes() {
+    const node = document.createElement('app-home');
+    Object.assign(node, { withList: true });
+    document.body.appendChild(node);
+
+    setTimeout(() => {
+      node.remove();
+      this.createNodes();
+    }, 300);
+  }
 
   async openModal(withList: boolean = false) {
     let modal = await modalController.create({
@@ -24,8 +35,8 @@ export class AppRoot {
       breakpoints: [0.5],
       showBackdrop: false,
       componentProps: {
-        withList
-      }
+        withList,
+      },
     });
     modal.onDidDismiss().then(() => {
       this.updateStats();
@@ -41,14 +52,14 @@ export class AppRoot {
     if (!('memory' in performance)) {
       return {
         total: 0,
-        used: 0
+        used: 0,
       };
     }
 
     const stats = performance.memory;
     return {
       total: stats.totalJSHeapSize,
-      used: stats.usedJSHeapSize
+      used: stats.usedJSHeapSize,
     };
   }
 
@@ -64,11 +75,11 @@ export class AppRoot {
 
     this.totalHeapSize = stats.total;
     this.usedHeapSize = stats.used;
-  };
-
-  private formatMemory(a: number): string {
-    return `${a / Math.pow(1000, 2)} MB`
   }
+
+  // private formatMemory(a: number): string {
+  //   return `${a / Math.pow(1000, 2)} MB`;
+  // }
 
   render() {
     return (
@@ -78,7 +89,7 @@ export class AppRoot {
         </header>
 
         <main class="ion-padding">
-          <ion-list>
+          {/* <ion-list>
             <ion-item>
               <ion-label>Total Heap Size</ion-label>
               <ion-note slot="end">{this.formatMemory(this.totalHeapSize)}</ion-note>
@@ -91,9 +102,16 @@ export class AppRoot {
               <ion-label>Used Diff</ion-label>
               <ion-note slot="end">{this.formatMemory(this.usedHeapSize - this.startingUsed)}</ion-note>
             </ion-item>
-          </ion-list>
-          <ion-button expand="block" onClick={() => this.openModal()}>Run Working</ion-button>
-          <ion-button expand="block" onClick={() => this.openModal(true)}>Run Broken</ion-button>
+          </ion-list> */}
+          <ion-button expand="block" onClick={() => this.openModal()}>
+            Run Working
+          </ion-button>
+          <ion-button expand="block" onClick={() => this.openModal(true)}>
+            Run Broken
+          </ion-button>
+          <ion-button expand="block" onClick={() => this.createNodes()}>
+            No Modal
+          </ion-button>
         </main>
       </div>
     );
